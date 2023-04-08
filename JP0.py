@@ -49,12 +49,8 @@ def ex_print(text, escape=False):
     else:
         print(text)
 
-
-def get_text(text, hps, cleaned=False):
-    if cleaned:
-        text_norm = text_to_sequence(text, hps.symbols, [])
-    else:
-        text_norm = text_to_sequence(text, hps.symbols, hps.data.text_cleaners)
+def get_text(text, hps):
+    text_norm = text_to_sequence(text, hps.data.text_cleaners)
     if hps.data.add_blank:
         text_norm = commons.intersperse(text_norm, 0)
     text_norm = LongTensor(text_norm)
@@ -147,38 +143,23 @@ def generateSound(inputString, fname, model, config, speaker_id, arousal, domina
             text, 'NOISE', 0.667, 'noise scale')
         noise_scale_w, text = get_label_value(
             text, 'NOISEW', 0.8, 'deviation of noise')
-        cleaned, text = get_label(text, 'CLEANED')
-        stn_tst = get_text(text, hps_ms, cleaned=cleaned)
-
+        stn_tst = get_text(text, hps_ms)
         # print_speakers(speakers, escape)
         # speaker_id = get_speaker_id('Speaker ID: ')
         # out_path = input('Path to save: ')
-        out_path = "E:/vscode/vits-client/output" + fname + ".wav"
+        out_path = "E:/vscode/vits-client/output/" + fname + ".wav"
         # stn_tst = get_text(txt, hps)
-        if False: 
-            with no_grad():
-                x_tst = stn_tst.unsqueeze(0)
-                x_tst_lengths = LongTensor([stn_tst.size(0)])
-                sid = LongTensor([speaker_id])
-                audio = net_g_ms.infer(x_tst, x_tst_lengths, sid=sid, noise_scale=noise_scale,
-                                       noise_scale_w=noise_scale_w, length_scale=length_scale)[0][
-                    0, 0].data.cpu().float().numpy()
-
-            write(out_path, hps_ms.data.sampling_rate, audio)
-            print('Successfully saved!')
-        else:
-            with no_grad():
-                x_tst = stn_tst.unsqueeze(0)
-                x_tst_lengths = LongTensor([stn_tst.size(0)])
-                sid = LongTensor([speaker_id])
-                emo = FloatTensor([[arousal, dominance, valence]])
-
-                audio = net_g_ms.infer(x_tst, x_tst_lengths, sid=sid, noise_scale=noise_scale,
-                                       noise_scale_w=noise_scale_w, length_scale=length_scale, emo=emo)[0][
-                    0, 0].data.cpu().float().numpy()
-
-            write(out_path, hps_ms.data.sampling_rate, audio)
-            print('Successfully emo saved!')
+        
+        with no_grad():
+            x_tst = stn_tst.unsqueeze(0)
+            x_tst_lengths = LongTensor([stn_tst.size(0)])
+            sid = LongTensor([speaker_id])
+            emo = FloatTensor([[arousal, dominance, valence]])
+            audio = net_g_ms.infer(x_tst, x_tst_lengths, sid=sid, noise_scale=noise_scale,
+                                   noise_scale_w=noise_scale_w, length_scale=length_scale, emo=emo)[0][
+                0, 0].data.cpu().float().numpy()
+        write(out_path, hps_ms.data.sampling_rate, audio)
+        print('Successfully emo saved!')
 
 
 
@@ -207,12 +188,15 @@ def handle_client(client_socket):
         config = info_dict['config']
         idx = int(info_dict['index'])
         text = info_dict['text']
+        arousal = float(info_dict['arousal'])
+        dominance = float(info_dict['dominance'])
+        valence = float(info_dict['valence'])
         eCode = str(text).encode()
         print(eCode)
         dCode = str(base64.b64decode(eCode), 'utf-8')
         print(dCode)
 
-        generateSound(dCode, random_id, model, config, idx, 0.7, 0.5, 0.5)
+        generateSound(dCode, random_id, model, config, idx, arousal, dominance, valence)
     except Exception as e:
         print(e)
 
