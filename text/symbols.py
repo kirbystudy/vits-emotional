@@ -1,11 +1,11 @@
 '''
 Defines the set of symbols used in text input to the model.
 '''
-'''
+
 _pad        = '_'
 _punctuation = ',.!?-'
 _letters = 'AEINOQUabdefghijkmnoprstuvwyzʃʧ↓↑ '
-'''
+
 
 '''
 # japanese_cleaners2
@@ -26,11 +26,11 @@ _punctuation = '，。！？—…'
 _letters = 'ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩˉˊˇˋ˙ '
 '''
 
-# zh_ja_mixture_cleaners
+'''# zh_ja_mixture_cleaners
 _pad        = '_'
 _punctuation = ',.!?-~…'
 _letters = 'AEINOQUabdefghijklmnoprstuvwyzʃʧʦɯɹəɥ⁼ʰ`→↓↑ '
-
+'''
 
 '''# sanskrit_cleaners
 _pad        = '_'
