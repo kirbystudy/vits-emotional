@@ -6,6 +6,7 @@
 pip install -r requirements.txt
 
 cd monotonic_align
+
 python setup.py build_ext --inplace
 
 
